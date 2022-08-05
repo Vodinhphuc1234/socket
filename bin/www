@@ -30,12 +30,20 @@ io.on("connection", function (client) {
   console.log("Made socket connection");
 
   client.on("onJoin", function (username, roomId) {
+    console.log(username, roomId);
     client.join(roomId);
-    client.to(roomId).emit("sendMessage", {text: `${username} joined`, createdAt: new Date(), from: `${username}`});
+    client
+      .to(roomId)
+      .emit("sendMessage", {
+        text: `${username} joined`,
+        createdAt: new Date(),
+        from: `${username}`,
+      });
   });
 
   client.on("sendMessage", function (data) {
     const { roomId, message } = data;
+    console.log(roomId, message);
     client.to(roomId).emit("sendMessage", message);
   });
 });
