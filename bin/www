@@ -15,23 +15,28 @@ var http = require("http");
 var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
-//socket
-const WebSocket = require("ws");
 /**
  * Create HTTP server.
  */
 
 var server = http.createServer(app);
 //*********** */
-const wss = new WebSocket.Server({ server });
-wss.on("connection", function connection(ws) {
-  ws.on("message", function incoming(message, isBinary) {
-    console.log(message.toString(), isBinary);
-    wss.clients.forEach(function each(client) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message.toString());
-      }
-    });
+
+//socket
+const socket = require("socket.io");
+// Socket setup
+const io = socket(server);
+io.on("connection", function (client) {
+  console.log("Made socket connection");
+
+  client.on("onJoin", function (username, roomId) {
+    client.join(roomId);
+    client.to(roomId).emit("sendMessage", `${username} joined`);
+  });
+
+  client.on("sendMessage", function (data) {
+    const { roomId, message } = data;
+    client.to(roomId).emit("sendMessage", message);
   });
 });
 
