@@ -31,7 +31,7 @@ io.on("connection", function (client) {
 
   client.on("onJoin", function (username, roomId) {
     client.join(roomId);
-    client.to(roomId).emit("sendMessage", `${username} joined`);
+    client.to(roomId).emit("sendMessage", {text: `${username} joined`, createdAt: new Date(), from: `${username}`});
   });
 
   client.on("sendMessage", function (data) {
